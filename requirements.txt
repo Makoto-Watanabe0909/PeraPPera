@@ -2,7 +2,6 @@ Flask
 opencv-python
 numpy
 camera
-global_value
 simpleaudio
 tkinter
 io
