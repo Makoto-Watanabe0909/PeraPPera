@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PeraPPera_Decoder</title>
+  <style>
+    #camera {
+      border: 9px solid #000000;
+      margin: 25px 25px 25px 25px;
+	    height: 200px;
+    }
+    #projection {
+      border: 9px solid #000000;
+      margin: 25px 25px 25px 25px;
+	    height: 150px;
+      width: 150px;
+    }
+</style>
+</head>
+<body>
+
+  <h1>PeraPPera_Decoder</h1>
+
+  <!--入力-->
+  <form method="POST">
+    <input type="text" name="resoCol" placeholder="解像度（たて）"><br>
+    <input type="text" name="resoRow" placeholder="解像度（よこ）"><br>
+    <input type="submit" value="OK"><br>
+  </form>
+
+  <!--映像-->
+  <img src="{{ url_for('video_feed') }}" id="camera"><br>
+
+  <!--投影画像の更新-->
+  <form action="/reloadProjection" method="POST">
+    <input type="submit" value="reload"><br>
+  </form>
+
+  <!--投影画像-->
+  <img src={{ image_path }} id="projection">
+
+  <!--エンコード-->
+  <form action="/toEncode" method="POST">
+    <input type="submit" value="encode"><br>
+  </form>
+
+  <!--再生-->
+  <form action="/toPlay" method="POST">
+    <input type="submit" value="play"><br>
+  </form>
+
+</body>
+</html>
