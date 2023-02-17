@@ -3,7 +3,7 @@ opencv-python
 numpy
 camera
 simpleaudio
-PIL
+Pillow
 pickletools
 re
 tty
