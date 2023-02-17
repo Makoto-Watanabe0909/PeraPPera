@@ -5,26 +5,11 @@ import global_value as g
 from camera import Camera
 from flask import Flask, request,render_template, Response
 import cv2
-import os
-import base64
-import io
-import sys
-import time
-import threading
-import math
 import numpy as np
-import cv2
 import simpleaudio
-import tkinter as tk
 import soundfile as sf
-from PIL import Image, ImageDraw, ImageFont, ImageTk, ImageOps, ImageFile
-from io import BytesIO
-from pickletools import pydict
-from re import A
-from tty import CFLAG
-from tkinter import filedialog
-from tkinter import ttk
-from decimal import Decimal, ROUND_HALF_UP, ROUND_HALF_EVEN
+from PIL import Image, ImageFile
+#from tty import CFLAG
 
 #============================
 #【セットアップ】
@@ -67,20 +52,20 @@ def form():
         g.dotsColumns = int(str(request.form['resoCol']))
         g.dotsRows = int(str(request.form['resoRow']))
 
-        return render_template('form.html')
+        return render_template('form_decode.html')
     else:
-        return render_template('form.html')
+        return render_template('form_decode.html')
 
 @app.route("/reloadProjection", methods=["POST"])
 def reloadProjection():
     print("reload!")
-    return render_template('form.html', image_path="static/images/projection.png")
+    return render_template('form_decode.html', image_path="static/images/projection.png")
 
 #============================
-#【エンコード】
-@app.route("/toEncode", methods=["POST"])
-def toEncode():
-    print("encode!")
+#【デコード】
+@app.route("/toDecode", methods=["POST"])
+def toDecode():
+    print("decode!")
 
     #2つの器を用意
     buffer = []
@@ -111,7 +96,7 @@ def toEncode():
     sf.write(filepath,  buffer, sr, format=_format, subtype=subtype)
 
     print("soundfile generated!")
-    return render_template('form.html')
+    return render_template('form_decode.html')
 
 #============================
 #【再生】
@@ -126,7 +111,7 @@ def toPlay():
     play_obj.wait_done()  #再生終わるまで待機
 
     print("play_finished")
-    return render_template('form.html')
+    return render_template('form_decode.html')
 
 #============================
 #【システム関連】

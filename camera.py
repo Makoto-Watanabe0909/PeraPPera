@@ -87,6 +87,7 @@ class Camera(object):
 
                 #time.sleep(3)
         else:
+            frame = np.array(Image.open('image/temp.png'))
             print("no image from cam")
 
         return frame
