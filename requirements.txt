@@ -3,7 +3,6 @@ opencv-python
 numpy
 camera
 simpleaudio
-io
 PIL
 pickletools
 re
