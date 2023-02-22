@@ -4,7 +4,6 @@ Flask
 
 numpy
 
-pyaudio
 simpleaudio
 wave
 soundfile
