@@ -6,7 +6,7 @@ from flask import Flask, request,render_template, Response
 import cv2
 import numpy as np
 import simpleaudio
-import pyaudio
+import sounddevice as sd
 import soundfile as sf
 from PIL import Image, ImageDraw, ImageFont
 import wave
@@ -35,6 +35,7 @@ g.chunk = 1024               # エンコード時のスプーン一杯のデー�
 #============================
 @app.route('/', methods=['GET', 'POST'])
 def main():
+    sd.default.device = 0
     return render_template('form_encode.html')
 
 #============================
@@ -42,37 +43,25 @@ def main():
 def toEncode():
     print("encode!")
 
-    #まずは録音===================
-    global target_file
-    rec_time = 4 #録音可能時間は4秒に設定
+    fs = 48000
+    duration = 4  # seconds
+    myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    sd.wait() #
 
-    audio = pyaudio.PyAudio()
-    stream = audio.open(format=pyaudio.paInt16, channels=1, rate=48000, input=True,
-                        input_device_index = 0,
-                        frames_per_buffer=g.chunk)
-    print("recording start...")
+    # ノーマライズ。量子化ビット16bitで録音するので int16 の範囲で最大化する
+    myrecording = myrecording / myrecording.max() * np.iinfo(np.int16).max
 
-    # 録音処理
-    frames = []
-    for i in range(0, int((48000/g.chunk) * rec_time)):
-        data = stream.read(g.chunk)
-        frames.append(data)
+    # float -> int
+    myrecording = myrecording.astype(np.int16)
 
-    print("recording  end...")
-
-    # 録音終了処理
-    stream.stop_stream()
-    stream.close()
-    audio.terminate()
-
-    # 録音データをファイルに保存
     filePath = "static/sound/recorded.wav"
-    wav = wave.open(filePath, 'wb')
-    wav.setnchannels(1)
-    wav.setsampwidth(audio.get_sample_size(pyaudio.paInt16))
-    wav.setframerate(48000)
-    wav.writeframes(b''.join(frames))
-    wav.close()
+
+    # ファイル保存
+    with wave.open(filePath, mode='wb') as wb:
+        wb.setnchannels(1)  # モノラル
+        wb.setsampwidth(2)  # 16bit=2byte
+        wb.setframerate(48000)
+        wb.writeframes(myrecording.tobytes())  # バイト列に変換
     #===========================
 
     #ドットを制作===================
