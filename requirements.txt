@@ -5,7 +5,6 @@ Flask
 numpy
 
 pyaudio
-portaudio
 
 simpleaudio
 wave
