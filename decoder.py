@@ -23,7 +23,11 @@ g.moduleChoice = ""
 g.dotsColumns = 80
 g.dotsRows = 400
 
-g.frame = np.array(Image.open('image/temp.png'))
+#============================
+@app.route('/', methods=['GET', 'POST'])
+def main():
+    Camera().__init__()
+    return render_template('form_decode.html')
 
 #============================
 #【カメラ映像】
@@ -43,14 +47,22 @@ def video_feed():
 
 #============================
 #【入力部分】
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/toSet', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
-        print("Module Choice : " + str(request.form['modu']))
-        print("Resolution : " + str(request.form['resoCol']) + "×" + str(request.form['resoRow']))
-        g.moduleChoice = str(request.form['modu'])
-        g.dotsColumns = int(str(request.form['resoCol']))
-        g.dotsRows = int(str(request.form['resoRow']))
+        answer = request.form.get('type')
+
+        if answer == "typeA":
+            g.dotsColumns = 250
+            g.dotsRows = 250
+        elif answer == "typeB":
+            g.dotsColumns = 200
+            g.dotsRows = 320
+        elif answer == "typeC":
+            g.dotsColumns = 100
+            g.dotsRows = 640
+
+        print("Resolution : " + str(g.dotsColumns) + "×" + str(g.dotsRows))
 
         return render_template('form_decode.html')
     else:
@@ -89,14 +101,14 @@ def toDecode():
             print("==========================")
 
     #溜まったデータをwavに変換
-    sr = 44100
+    sr = 48000
     filepath = "static/sound/decoded.wav"
     _format = "WAV"
     subtype = 'PCM_24'
     sf.write(filepath,  buffer, sr, format=_format, subtype=subtype)
 
     print("soundfile generated!")
-    return render_template('form_decode.html')
+    return render_template('form_decode.html', image_path="static/images/projection.png")
 
 #============================
 #【再生】
@@ -111,7 +123,7 @@ def toPlay():
     play_obj.wait_done()  #再生終わるまで待機
 
     print("play_finished")
-    return render_template('form_decode.html')
+    return render_template('form_decode.html', image_path="static/images/projection.png")
 
 #============================
 #【システム関連】

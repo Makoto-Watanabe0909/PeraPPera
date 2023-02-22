@@ -44,6 +44,7 @@ class Camera(object):
 
         camHeight = self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
         camWidth = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)  #画像のサイズを取得
+        print("camera initialized!")
 
     def __del__(self):
         self.video.release()
