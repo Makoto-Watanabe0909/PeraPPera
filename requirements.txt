@@ -13,4 +13,3 @@ opencv-python
 Pillow
 
 camera
-subprocess
