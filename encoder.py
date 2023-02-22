@@ -12,8 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 import wave
 
 import math
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import subprocess
 from io import BytesIO
 

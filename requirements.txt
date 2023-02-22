@@ -1,6 +1,16 @@
 Flask
+Gunicorn
+
 opencv-python
 numpy
 camera
 simpleaudio
 Pillow
+wave
+math
+
+#encoder only
+soundfile
+pyaudio
+io
+subprocess
