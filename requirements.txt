@@ -1,15 +1,16 @@
-Flask
 Gunicorn
 
-opencv-python
-numpy
-camera
-simpleaudio
-Pillow
-wave
+Flask
 
-#encoder only
-soundfile
+numpy
+
 pyaudio
-io
+simpleaudio
+wave
+soundfile
+
+opencv-python
+Pillow
+
+camera
 subprocess
