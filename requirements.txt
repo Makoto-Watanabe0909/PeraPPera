@@ -7,7 +7,6 @@ camera
 simpleaudio
 Pillow
 wave
-math
 
 #encoder only
 soundfile

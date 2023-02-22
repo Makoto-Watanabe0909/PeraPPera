@@ -10,7 +10,6 @@ import pyaudio
 import soundfile as sf
 from PIL import Image, ImageDraw, ImageFont
 import wave
-
 import math
 import subprocess
 from io import BytesIO
@@ -127,12 +126,12 @@ def toEncode():
             outputImg[printX, printY] = np.array([rawColor[0],rawColor[1],rawColor[2]])
             dCount += 1
     #紙をpngで書き出し
-    cv2.imwrite(g.soundname + '.png', outputImg)
+    cv2.imwrite("static/images/" + g.soundname + '.png', outputImg)
 
     print("dotted!!!")
 
     #＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝書き出した紙にマーカーを印刷＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-    paper = Image.open(g.soundname + '.png')
+    paper = Image.open("static/images/" + g.soundname + '.png')
 
     #マーカーの画像を読み込み→貼り付け
     for i in range(4) :
