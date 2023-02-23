@@ -69,7 +69,6 @@ def toEncode():
     #Databaseファイルから拾ってくる情報
     arucoSize = Database.arucoSize          #マーカのサイズ
     marginPaper = Database.marginPaper      #紙の上下左右の余白
-    ncSoundRows = Database.ncSoundRows      #ノイズキャンセリング用の無音地帯の高さ
     marginColor = Database.marginColor      #余白の色
 
     #wavファイルを読み込んでバッファに詰め込む
