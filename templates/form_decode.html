@@ -6,17 +6,25 @@
   <style>
     body {
       font-family: 'DotGothic16';
+      margin: 0px 25px 25px 25px;
     }
     #camera {
       border: 9px solid #000000;
-      margin: 25px 25px 25px 25px;
-	    height: 200px;
+      margin: 25px 0px 0px 0px;
+        height: 200px;
     }
     #projection {
       border: 9px solid #000000;
-      margin: 25px 25px 25px 25px;
-	    height: 150px;
+      margin: 0px 0px 0px 0px;
+      height: 150px;
       width: 150px;
+    }
+    #message {
+      margin: 0px 0px 0px 0px;
+      width: 374px;
+    }
+    #form {
+      background-color: #d0d0d0;
     }
 </style>
 </head>
@@ -25,45 +33,50 @@
   <h1>PeraPPera_Decoder</h1>
 
   <!--入力-->
-  <form action="/toSet" method="POST">
-    <div>
-      <p>ドットのタテヨコ比</p>
-			<label for="r1">250×250</label>
-			<input type="radio" id="r1" name="type" value="typeA">
-		</div>
-		<div>
-			<label for="r2">200×320</label>
-			<input type="radio" id="r2" name="type" value="typeB">
-		</div>
-		<div>
-			<label for="r3">100×640</label>
-			<input type="radio" id="r3" name="type" value="typeC">
-		</div>
-		<div>
-			<input type="submit" value="OK">
-		</div>
-  </form>
+    <div id="form">
+        <form action="/toSet" method="POST">
+            <div>
+                <p>▶︎aspect ratio</p>
+                <label for="r1">250×250</label>
+                <input type="radio" id="r1" name="type" value="typeA">
+            </div>
+            <div>
+                <label for="r2">200×320</label>
+                <input type="radio" id="r2" name="type" value="typeB">
+            </div>
+            <div>
+                <label for="r3">100×640</label>
+                <input type="radio" id="r3" name="type" value="typeC" checked="checked">
+            </div>
+            <div>
+                <input type="submit" value="OK" id="buttonToSet">
+            </div>
+        </form>
+    </div>
 
-  <!--映像-->
-  <img src="{{ url_for('video_feed') }}" id="camera"  alt=""><br>
+        <!--映像-->
+        <img src="{{ url_for('video_feed') }}" id="camera" alt=""><br>
+        <!--メッセージ-->
+        <img src={{ message_path }} id="message" alt="">
 
-  <!--投影画像の更新-->
-  <form action="/reloadProjection" method="POST">
-    <input type="submit" value="RELOAD"><br>
-  </form>
+        <!--投影画像の更新-->
+        <form action="/reloadProjection" method="POST">
+            <input type="submit" value="IMAGE RELOAD" id="buttonToReload"><br>
+        </form>
+        <!--投影画像-->
+        <img src={{ image_path }} id="projection" alt="">
 
-  <!--投影画像-->
-  <img src={{ image_path }} id="projection"  alt="">
-
-  <!--デコード-->
-  <form action="/toDecode" method="POST">
-    <input type="submit" value="DECODE"><br>
-  </form>
-
-  <!--再生-->
-  <form action="/toPlay" method="POST">
-    <input type="submit" value="PLAY"><br>
-  </form>
-
+        <!--デコード-->
+        <form action="/toDecode" method="POST">
+            <input type="submit" value="DECODE" id="buttonToDecode"><br>
+        </form>
+        <!--再生-->
+        <form action="/toPlay" method="POST">
+            <input type="submit" value="PLAY" id="buttonToPlay"><br>
+        </form>
+        <!--データ抹消-->
+        <form action="/toDelete" method="POST">
+            <input type="submit" value="DELETE" id="buttonToSubmit"><br>
+        </form>
 </body>
 </html>

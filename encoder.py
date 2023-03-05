@@ -4,6 +4,7 @@ import Database
 import global_value as g
 from flask import Flask, request,render_template, Response
 import cv2
+import os
 import numpy as np
 import simpleaudio
 import sounddevice as sd
@@ -12,6 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 import wave
 import math
 import subprocess
+import shutil
 from io import BytesIO
 
 #from tty import CFLAG
@@ -23,10 +25,9 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 #ドットの配列のタテヨコ
-g.moduleChoice = ""
-g.dotsColumns = 80
-g.dotsRows = 400
-g.soundname = "a"
+g.dotsColumns = 100
+g.dotsRows = 640
+g.soundname = "no name"
 
 g.paper = Image.open('image/temp.png')
 
@@ -36,17 +37,19 @@ g.chunk = 1024               # エンコード時のスプーン一杯のデー�
 @app.route('/', methods=['GET', 'POST'])
 def main():
     sd.default.device = 0
-    return render_template('form_encode.html')
+    return render_template('form_encode.html', message_path="../static/messages/default.png")
 
 #============================
 #【エンコード】
 def toEncode():
-    print("encode!")
+    print("***PeraPPera : record started")
 
     fs = 48000
     duration = 4  # seconds
     myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     sd.wait() #
+
+    print("***PeraPPera : record finished")
 
     # ノーマライズ。量子化ビット16bitで録音するので int16 の範囲で最大化する
     myrecording = myrecording / myrecording.max() * np.iinfo(np.int16).max
@@ -74,8 +77,6 @@ def toEncode():
     #wavファイルを読み込んでバッファに詰め込む
     data, original_samplerate = sf.read(filePath)
 
-    print(g.soundname, " loaded : samplerate = ", original_samplerate)
-
     #増幅用の処理
     maxData = 0
     for n in range(int(data.size)): #音声データの最大値を取得
@@ -84,7 +85,7 @@ def toEncode():
     bairitsu = 0
     if not maxData == 0:
         bairitsu = 1/maxData #この値をかけて増幅する
-    print("maxData = ", maxData, " bairitsu = ", bairitsu)
+    print("***PeraPPera : maxData = ", maxData, " bairitsu = ", bairitsu)
 
     #紙の縦幅、横幅
     width = g.dotsColumns + arucoSize*2
@@ -116,8 +117,6 @@ def toEncode():
     #紙をpngで書き出し
     cv2.imwrite("static/images/" + g.soundname + '.png', outputImg)
 
-    print("dotted!!!")
-
     #＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝書き出した紙にマーカーを印刷＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
     paper = Image.open("static/images/" + g.soundname + '.png')
 
@@ -143,16 +142,24 @@ def toEncode():
     mag = 5  #拡大率
     (width, height) = (paper.width*mag, paper.height*mag)
     paper = paper.resize((width, height))
-
+        
     #情報を印刷
     draw = ImageDraw.Draw(paper)
     font = ImageFont.truetype('./fonts/PixelMplus12-Regular.ttf', 28)
     outputText = "\"" + g.soundname + "\" " + str(g.dotsColumns) + "×" + str(g.dotsRows)
     draw.multiline_text((10, 5), outputText, fill=(0, 0, 0), font=font)
 
+    #紙のサイズを整形
+    if g.dotsColumns == 250:
+        paper = add_margin(paper, 500, 500, 500, 500, (255, 255, 255))
+    if g.dotsColumns == 200:
+        paper = add_margin(paper, 400, 600, 400, 600, (255, 255, 255))
+    if g.dotsColumns == 100:
+        paper = add_margin(paper, 50, 0, 50, 0, (255, 255, 255))
+        
     g.paper = paper
     paper.save("static/images/papertoprint.png")
-    print("saved!!!")
+    print("***PeraPPera : paper generated!!!")
 
 #============================
 #【入力部分】
@@ -173,46 +180,71 @@ def form():
             g.dotsColumns = 100
             g.dotsRows = 640
 
-        print("Resolution : " + str(g.dotsColumns) + "×" + str(g.dotsRows))
+        print("***PeraPPera : Resolution : " + str(g.dotsColumns) + "×" + str(g.dotsRows))
 
         toEncode()
-        return render_template('form_encode.html', image_path="static/images/papertoprint.png")
+
+    if os.path.isfile("static/images/papertoprint.png"):
+        return render_template('form_encode.html', image_path="static/images/papertoprint.png", message_path="../static/messages/printready.png")
     else:
-        return render_template('form_encode.html')
+        return render_template('form_encode.html', message_path="../static/messages/printready.png")
 
 #============================
 #【音声の確認】
 @app.route("/toCheck", methods=["POST"])
 def toCheck():
-    print("play!")
+    print("***PeraPPera : play!")
 
     filepath = "static/sound/recorded.wav"
-    wav_obj = simpleaudio.WaveObject.from_wave_file(filepath)
-    play_obj = wav_obj.play()
-    play_obj.wait_done()  #再生終わるまで待機
 
-    print("play_finished")
-    return render_template('form_encode.html', image_path="static/images/papertoprint.png")
+    if os.path.isfile(filepath):
+        wav_obj = simpleaudio.WaveObject.from_wave_file(filepath)
+        play_obj = wav_obj.play()
+        play_obj.wait_done()  #再生終わるまで待機
+        print("***PeraPPera : play_finished")
+    else:
+        print("***PeraPPera : no decoded audio data")
+        return render_template('form_encode.html', image_path="static/images/papertoprint.png", message_path="../static/messages/nodatatoprint.png")
+
+    return render_template('form_encode.html', image_path="static/images/papertoprint.png", message_path="../static/messages/printready.png")
 
 #============================
 #【プリント】
 @app.route("/toPrint", methods=["POST"])
 def toPrint():
-    print("print!")
 
-    buf = BytesIO()
+    if os.path.isfile("static/images/papertoprint.png"): #あくまで条件分岐にファイルの有無を使用しているだけで、このpngファイル自体を印刷する訳ではない
+        buf = BytesIO()
+        g.paper.save(buf, 'PNG')
 
-    g.paper.save(buf, 'PNG')
+        p = subprocess.Popen('lpr', stdin=subprocess.PIPE)
+        p.communicate(buf.getvalue())
 
-    p = subprocess.Popen('lpr', stdin=subprocess.PIPE)
-    p.communicate(buf.getvalue())
+        p.stdin.close()
+        buf.close()
+        print("***PeraPPera : print ready")
+    else:
+        print("***PeraPPera : no paper to print")
+        return render_template('form_encode.html', image_path="static/images/papertoprint.png", message_path="../static/messages/nodatatoprint.png")
 
-    print("print ready")
-    p.stdin.close()
-    buf.close()
+    return render_template('form_encode.html', image_path="static/images/papertoprint.png", message_path="../static/messages/printready.png")
 
-    print("print finished!")
-    return render_template('form_encode.html', image_path="static/images/papertoprint.png")
+#============================
+#【抹消】
+@app.route("/toDelete", methods=["POST"])
+def toDelete():
+
+    if os.path.isfile("static/sound/recorded.wav"):
+        os.remove("static/sound/recorded.wav")
+        print("***PeraPPera : deleted")
+    else:
+        print("***PeraPPera : file to delete not found")
+
+    #画像が入ってるディレクトリごと消去→作成
+    shutil.rmtree("static/images")
+    os.mkdir("static/images")
+
+    return render_template('form_encode.html', message_path="../static/messages/yourdatahasbeendeleted.png")
 
 #============================
 #【システム関連】

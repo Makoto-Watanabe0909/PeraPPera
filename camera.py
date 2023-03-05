@@ -54,7 +54,7 @@ class Camera(object):
         ret, image = self.video.read()
         global corners, ids, rejectedCandidates
 
-        if image is not None:
+        if ret:
             corners, ids, rejectedCandidates = aruco.detectMarkers(image, dictionary, parameters=parameters) #マーカーを全部検知
             markedImg = aruco.drawDetectedMarkers(image, corners, ids)
             list_ids = np.ravel(ids)  #検知できたマーカーの1次元リスト
@@ -90,5 +90,9 @@ class Camera(object):
         else:
             frame = np.array(Image.open('image/temp.png'))
             print("no image from cam")
+
+            self.video.release()
+            self.video = cv2.VideoCapture(DEVICE_ID)
+
 
         return frame
